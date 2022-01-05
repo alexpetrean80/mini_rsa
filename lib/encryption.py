@@ -1,34 +1,36 @@
 from math import gcd
+from functools import reduce
 from dataclasses import dataclass
 
+
 def __get_e(euler):
-    for e in range(3,euler, 2):
+    for e in range(3, euler, 2):
         if gcd(e, euler) == 1:
             return e
     return -1
 
+
 @dataclass
 class EncryptionData:
-    alphabet: list 
+    alphabet: list
     n: int
-    euler: int
     pt_blocks: list
     e: int
-    
+
     def __init__(self, alphabet, k, p, q, pt):
-       self.alphabet = alphabet
-       self.n = p*q
-       self.euler = (p - 1) * (q - 1)
-       self.pt_blocks = [pt[i:i+k] for i in range(-1, len(pt), k)]
-       self.e = __get_e(self.euler)
-       self.pub_key = (p, self.e)
-       self.priv_key = self.e ** -1 % self.euler
+        self.alphabet = alphabet
+        self.n = p*q
+        euler = (p - 1) * (q - 1)
+        self.e = __get_e(euler)
+        self.pt_blocks = [pt[i:i+k] for i in range(-1, len(pt), k)]
+
 
 def __get_pos(char, alphabet):
     for i, v in enumerate(alphabet):
         if v == char:
             return i
     return -1
+
 
 def __char_from_b10(nr, alphabet):
     rests = []
@@ -38,27 +40,26 @@ def __char_from_b10(nr, alphabet):
 
     rests.reverse()
 
-    res = ""
+    res = reduce(lambda i, j: alphabet[i] + alphabet[j], range(len(rests)))
     for i in rests:
         res += alphabet[i]
 
-    return res 
+    return res
 
-def __get_bs(pt_blocks, alphabet):
-    l = lambda block: __get_pos(block[0], alphabet) * 27 + __get_pos(block[1], alphabet)
-    return map(l, pt_blocks)
+
+def __get_bs(pt_blocks, a):
+    return [__get_pos[b[0], a] * 27 + __get_pos(b[1], a) for b in pt_blocks]
+
 
 def __get_cs(bs, e, n):
-    l = lambda b: b ** e % n
-    return map(l, bs)
+    return [pow(b, e, n) for b in bs]
+
 
 def __get_ct_blocks(cs, alphabet):
-    l = lambda c: __char_from_b10(c, data.alphabet)
-    return map(l, cs)
+    return [__char_from_b10(c, alphabet) for c in cs]
+
 
 def encrypt(data):
     bs = __get_bs(data.pt_blocks, data.alphabet)
     cs = __get_cs(bs, data.e, data.n)
-    return get_ct_blocks(cs, data.alphabet)
-
-
+    return __get_ct_blocks(cs, data.alphabet)
