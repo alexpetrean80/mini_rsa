@@ -1,3 +1,4 @@
+import random
 from dataclasses import dataclass
 from math import gcd
 from functools import reduce
@@ -24,16 +25,16 @@ class PrivateKeyOwner:
         self.__establish_block_sizes()  # check course 5 slide 22 for explanation
 
     def __generate_public_key(self, euler):
-
-        for e in range(3, euler, 2):
+        while True:
+            e = random.randrange(3, euler, 2)
             if gcd(e, euler) == 1:
                 return e
-        return -1
+
 
     def __generate_private_key(self, euler):
         return pow(self.e, -1, euler)
 
-    def __establish_block_sizes(self):  # course 5 slide 22 explains block sizes for enc and dec and their properties
+    def __establish_block_sizes(self):
         self.plain_block_size = 1
         self.cipher_block_size = 1
 
