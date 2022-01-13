@@ -25,7 +25,7 @@ def get_low_level_prime(n):
 
         # Test divisibility by pre-generated primes
         for divisor in first_primes_list:
-            if pc % divisor == 0 and divisor ** 2 <= pc:
+            if pc % divisor == 0:
                 break
         else:
             return pc
@@ -58,16 +58,24 @@ def is_miller_rabin_passed(mrc):
 
 def generating_primes(n):
     ok = 0
+    p = 0
+    q = 0
     while True:
-        f = open("p_and_q.txt", "a")
+        f = open("./p_and_q.txt", "a")
         prime_candidate = get_low_level_prime(n)
         if not is_miller_rabin_passed(prime_candidate):
             continue
         else:
             f.write(str(prime_candidate) + '\n')
+            if ok == 0:
+                p = prime_candidate
+            else:
+                q = prime_candidate
             ok += 1
         if ok == 2:
             break
+    f.close()
+    return p, q
 
 
 # if __name__ == '__main__':
