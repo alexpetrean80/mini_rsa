@@ -3,6 +3,7 @@ from lib.utils.alphabet import Alphabet
 from lib.decryption import PrivateKeyOwner
 from lib.encryption import PublicKeyOwner
 from lib.key_generation import generating_primes
+
 if __name__ == '__main__':
 
     p, q = generating_primes(1024)

@@ -21,36 +21,49 @@ def get_low_level_prime(n):
     # Generating a prime candidate divisible by first primes
     while True:
         # Obtain a random number
-        pc = n_random(n)
+        candidate_prime = n_random(n)
 
         # Test divisibility by pre-generated primes
         for divisor in first_primes_list:
-            if pc % divisor == 0:
+            if candidate_prime % divisor == 0:
                 break
         else:
-            return pc
+            return candidate_prime
 
 
-def is_miller_rabin_passed(mrc):
+def is_miller_rabin_passed(candidate):
     # 20 iterations of Rabin Miller Primality test
-    maxDivisionsByTwo = 0
-    ec = mrc - 1
-    while ec % 2 == 0:
-        ec >>= 1
-        maxDivisionsByTwo += 1
-    assert (2 ** maxDivisionsByTwo * ec == mrc - 1)
+    s = 0
+    t = candidate - 1
+    while t % 2 == 0:
+        t >>= 1
+        s += 1
+    assert (2 ** s * t == candidate - 1)
 
     def trial_composite(round_tester):
-        if pow(round_tester, ec, mrc) == 1:
+        if pow(round_tester, t, candidate) == 1:
             return False
-        for i in range(maxDivisionsByTwo):
-            if pow(round_tester, 2 ** i * ec, mrc) == mrc - 1:
+        a = pow(round_tester, t, candidate)
+        for i in range(s):
+            if a == 1 and i == 0:
                 return False
+            if a == candidate - 1:
+                return False
+            a = (a*a) % candidate
         return True
 
-    numberOfRabinTrials = 20
-    for i in range(numberOfRabinTrials):
-        round_tester = random.randrange(2, mrc)
+    number_of_rabin_trials = 20
+
+    used_testers = set()
+
+    for i in range(number_of_rabin_trials):
+
+        while True:
+            round_tester = random.randrange(2, candidate)
+            if round_tester not in used_testers:
+                used_testers.add(round_tester)
+                break
+
         if trial_composite(round_tester):
             return False
     return True
